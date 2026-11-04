@@ -25,7 +25,7 @@ API_KEY=ollama
 MODEL=qwen2.5:7b
 ```
 
-Use the 7B. The 3B fumbles tool calls. `npm run check` tells you whether the agent can reach your model.
+Use the 7B. The 3B fumbles tool calls. On an 8 GB laptop, run `ollama stop llama3.2:3b` first so both models aren't loaded at once. `npm run check` tells you whether the agent can reach your model.
 
 ## Give it hands (Checkpoint 3, part two)
 

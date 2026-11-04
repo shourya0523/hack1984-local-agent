@@ -12,7 +12,7 @@ echo "== Installers"
 dl() { curl -fL --retry 3 -o "$OUT/installers/$2" "$1" || echo "!! failed: $1 (download it by hand from https://ollama.com/download)"; }
 dl https://ollama.com/download/Ollama.dmg              Ollama.dmg
 dl https://ollama.com/download/OllamaSetup.exe         OllamaSetup.exe
-dl https://ollama.com/download/ollama-linux-amd64.tgz  ollama-linux-amd64.tgz
+dl https://ollama.com/download/ollama-linux-amd64.tar.zst  ollama-linux-amd64.tar.zst
 
 echo "== Models"
 for m in "${MODELS[@]}"; do ollama pull "$m"; done
