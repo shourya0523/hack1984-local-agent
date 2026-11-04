@@ -1,0 +1,12 @@
+{
+  "name": "hack1984-local-agent",
+  "version": "1.0.0",
+  "description": "A tiny tool-calling agent that runs on a local model (Ollama) or any OpenAI-compatible API. HACK1984 Local Inference workshop.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "start": "node --env-file=.env agent.js",
+    "check": "node --env-file=.env agent.js --check"
+  }
+}
