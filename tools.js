@@ -1,8 +1,8 @@
 // Tools the agent can call. Each one is: a name, a description the model reads,
 // a JSON Schema for its arguments, and a run() function that does the real work.
 //
-// This is the finished version from Checkpoint 3, part two: three tools that only
-// your laptop can answer. Nothing here leaves the machine.
+// Four tools that only your laptop can answer. Nothing here leaves the machine.
+// Checkpoint 3, part two: copy one, make it do something new, restart with `npm start`.
 
 import { readFile, readdir, stat } from "node:fs/promises";
 import { execFile } from "node:child_process";

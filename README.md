@@ -29,9 +29,14 @@ Use the 7B. The 3B fumbles tool calls. On an 8 GB laptop, run `ollama stop llama
 
 ## Give it hands (Checkpoint 3, part two)
 
-Open `tools.js`, copy the `get_time` tool, and make one that only your laptop can answer: read a file in `~/notes`, search a folder you'd never upload, or check your battery. Restart with `npm start` and ask something that needs it. A red `[tool]` line means the model called your tool. If it made something up instead, tighten the tool's `description`.
+The agent ships with four tools that only your laptop can answer, all in `tools.js`:
 
-Stuck or behind? `git checkout checkpoint-3` has a finished version with `read_note`, `search_folder` and `check_battery`.
+- `get_time`: the laptop's clock
+- `read_note`: reads a file in `~/notes` (try `mkdir -p ~/notes && echo "pitch at 11am Sunday" > ~/notes/ideas.md`)
+- `search_folder`: searches a folder you'd never upload
+- `check_battery`: battery level, on Mac, Windows or Linux
+
+Ask something that needs one, like "what's in my ideas note?" A red `[tool]` line means the model called it. Then add your own: copy one of them in `tools.js`, change it, and restart with `npm start`. If the model made something up instead of calling your tool, tighten the tool's `description`.
 
 ## Laptop says no?
 
