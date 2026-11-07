@@ -2,6 +2,8 @@
 
 A tool-calling agent in one file with no dependencies, for the **HACK1984 Local Inference** workshop (Sat Nov 7, 300 Mass Ave, Boston). It talks to anything that speaks the OpenAI chat completions API, so the same code runs on a local model through Ollama, or on a hosted one (Groq, OpenAI) by changing one environment variable.
 
+Every workshop command, with copy buttons: open [`commands.html`](commands.html) in your browser, or the [live page](https://claude.ai/artifact/9TDBFz5tbrNUoXn9fx5FgJ).
+
 ## You need
 
 - [Ollama](https://ollama.com/download) running, with a model pulled: `ollama pull qwen2.5:7b`

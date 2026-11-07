@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local Inference Commands</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;500&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow reading column, terminal-panel code blocks, sticky checkpoint index on wide screens. */
+:root{
+  --bg:#000000; --panel:#0e0d0d; --line:#2c2c2c; --fg:#f2f2f2; --muted:#8c8c8c; --soft:#cfcfcf; --red:#e0322a; --red-hi:#ff3b2f;
+  --display:"Funnel Display", "Helvetica Neue", Arial, sans-serif;
+  --mono:"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--mono);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
+.wrap{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:56px;padding-block:56px 96px}
+nav{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 24px);align-self:start;display:grid;gap:6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--muted);text-decoration:none;padding:4px 0}
+nav a:hover,nav a:focus-visible{color:var(--fg)}
+nav a span{color:var(--red);margin-right:8px}
+main{min-width:0;max-width:720px}
+.kicker{display:inline-block;background:var(--line);color:var(--muted);font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:3px 8px}
+h1{font:500 clamp(36px,7vw,60px)/1.02 var(--display);margin:18px 0 14px;text-wrap:balance;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--red)}
+.meta{color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px}
+.lede{color:var(--soft);max-width:60ch;margin:0}
+section{border-top:1px solid var(--line);padding-top:32px;margin-top:48px;scroll-margin-top:24px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.tag{color:var(--red);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+.time{color:var(--muted);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+h2{font:500 clamp(26px,4.4vw,34px)/1.1 var(--display);margin:8px 0 16px;text-wrap:balance;flex-basis:100%}
+p{max-width:64ch;color:var(--soft);margin:0 0 14px}
+p strong,li strong{color:var(--fg);font-weight:500}
+ol.steps{list-style:none;padding:0;margin:0 0 18px;counter-reset:s}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:32px minmax(0,1fr);border-bottom:1px solid var(--line);padding:10px 0;color:var(--soft)}
+ol.steps li::before{content:counter(s, decimal-leading-zero);color:var(--red);font-size:12px;padding-top:2px}
+a{color:var(--fg);text-decoration-color:var(--red);text-underline-offset:3px}
+code.i{background:var(--line);color:var(--fg);padding:1px 6px;font-size:.92em}
+.code{position:relative;background:var(--panel);border:1px solid var(--line);margin:0 0 18px}
+.code .label{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:6px 6px 6px 14px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.code pre{margin:0;padding:14px;overflow-x:auto;font:13.5px/1.65 var(--mono);color:var(--fg)}
+.code pre .c{color:var(--muted)}
+.code pre .p{color:var(--muted);user-select:none}
+button.copy{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;background:var(--red);color:#fff;border:0;padding:7px 12px;cursor:pointer;min-height:32px}
+button.copy:hover{background:var(--red-hi)}
+button.copy:focus-visible,nav a:focus-visible,a:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+button.copy.done{background:var(--fg);color:#000}
+.note{border:1px solid var(--line);padding:12px 14px;color:var(--soft);margin:0 0 18px;font-size:14px}
+.note b{color:var(--red);font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:11px;margin-right:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl{overflow-x:auto;margin-bottom:18px}
+th{text-align:left;color:var(--muted);font-weight:400;font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:8px 12px 8px 0;border-bottom:1px solid var(--line)}
+td{padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--soft)}
+td:first-child{color:var(--fg);white-space:nowrap}
+footer{margin-top:72px;color:var(--muted);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding-block:32px 72px}nav{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Checkpoints"><a href="#before"><span>00</span>Before you come</a><a href="#cp1"><span>01</span>Wake it up</a><a href="#cp2"><span>02</span>It speaks OpenAI</a><a href="#measure"><span>03</span>Measure it</a><a href="#cp3"><span>04</span>A local brain</a><a href="#hands"><span>05</span>Give it hands</a><a href="#stuck"><span>06</span>Stuck</a><a href="#next"><span>07</span>Next workshop</a></nav>
+<main>
+<span class="kicker">HACK1984 / Workshop / Local inference</span>
+<h1>Run AI on your laptop. <em>Tell nobody.</em></h1>
+<p class="meta">Sat Nov 7 / 300 Mass Ave, Boston / Shourya Yadav + Rush Sangrajka</p>
+<p class="lede">Every command from the workshop, in order. Tap Copy, paste into your terminal.</p>
+<section id="before"><div class="sec-head"><span class="tag">Before you come</span><h2>Show up installed.</h2></div><p>The venue Wi-Fi will be shared by a hundred people downloading the same model, so do this at home. If you can't, grab a USB drive from a TA.</p><ol class="steps"><li><span>Install Ollama from <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a> and open it once.</span></li><li><span>Install <a href="https://nodejs.org" target="_blank" rel="noopener">Node.js</a> 20.6 or newer, and git.</span></li><li><span>Pull both models (about 7 GB together):</span></li></ol><div class="code"><div class="label"><span>terminal</span><button class="copy" type="button" data-for="c1">Copy</button></div><pre id="c1" data-copy="ollama pull llama3.2:3b
+ollama pull qwen2.5:7b
+node --version"><span class="p">$ </span>ollama pull llama3.2:3b
+<span class="p">$ </span>ollama pull qwen2.5:7b
+<span class="p">$ </span>node --version</pre></div></section><section id="cp1"><div class="sec-head"><span class="tag">Checkpoint 01</span><span class="time">10 min</span><h2>Wake it up.</h2></div><div class="code"><div class="label"><span>terminal</span><button class="copy" type="button" data-for="c2">Copy</button></div><pre id="c2" data-copy="ollama pull llama3.2:3b
+ollama run llama3.2:3b"><span class="p">$ </span>ollama pull llama3.2:3b
+<span class="p">$ </span>ollama run llama3.2:3b</pre></div><div class="code"><div class="label"><span>inside ollama</span><button class="copy" type="button" data-for="c3">Copy</button></div><pre id="c3" data-copy="/set system You only answer in haiku.
+what is a hackathon
+/bye">&gt;&gt;&gt; /set system You only answer in haiku.
+&gt;&gt;&gt; what is a hackathon
+&gt;&gt;&gt; /bye</pre></div><p>Then swap in <code class='i'>qwen2.5:7b</code>. Slower, smarter. Feel the difference in your fans. On an 8 GB laptop, unload the 3B first so the two don't fight over memory:</p><div class="code"><div class="label"><span>terminal</span><button class="copy" type="button" data-for="c4">Copy</button></div><pre id="c4" data-copy="ollama stop llama3.2:3b
+ollama run qwen2.5:7b"><span class="p">$ </span>ollama stop llama3.2:3b
+<span class="p">$ </span>ollama run qwen2.5:7b</pre></div></section><section id="cp2"><div class="sec-head"><span class="tag">Checkpoint 02</span><span class="time">7 min</span><h2>Surprise: it speaks OpenAI.</h2></div><div class="code"><div class="label"><span>mac / linux</span><button class="copy" type="button" data-for="c5">Copy</button></div><pre id="c5" data-copy="curl http://localhost:11434/v1/chat/completions \
+    -H &quot;Content-Type: application/json&quot; \
+    -d &#x27;{&quot;model&quot;: &quot;qwen2.5:7b&quot;, &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;playfully roast my laptop&quot;}]}&#x27;"><span class="p">$ </span>curl http://localhost:11434/v1/chat/completions \
+    -H &quot;Content-Type: application/json&quot; \
+    -d &#x27;{&quot;model&quot;: &quot;qwen2.5:7b&quot;, &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;playfully roast my laptop&quot;}]}&#x27;</pre></div><div class="code"><div class="label"><span>windows powershell</span><button class="copy" type="button" data-for="c6">Copy</button></div><pre id="c6" data-copy="$body = &#x27;{&quot;model&quot;: &quot;qwen2.5:7b&quot;, &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;playfully roast my laptop&quot;}]}&#x27;
+Invoke-RestMethod http://localhost:11434/v1/chat/completions -Method Post -ContentType &quot;application/json&quot; -Body $body"><span class="p">$ </span>$body = &#x27;{&quot;model&quot;: &quot;qwen2.5:7b&quot;, &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;playfully roast my laptop&quot;}]}&#x27;
+<span class="p">$ </span>Invoke-RestMethod http://localhost:11434/v1/chat/completions -Method Post -ContentType &quot;application/json&quot; -Body $body</pre></div><p>Same request shape as OpenAI's API. Anything that talks to OpenAI can talk to this. No GPU? The answer can take 20 to 40 seconds, so be patient.</p><div class="code"><div class="label"><span>what&#x27;s loaded, and how much memory it&#x27;s eating</span><button class="copy" type="button" data-for="c7">Copy</button></div><pre id="c7" data-copy="ollama ps"><span class="p">$ </span>ollama ps</pre></div></section><section id="measure"><div class="sec-head"><span class="tag">Measure it</span><h2>Vibes are not a benchmark.</h2></div><div class="code"><div class="label"><span>terminal</span><button class="copy" type="button" data-for="c8">Copy</button></div><pre id="c8" data-copy="ollama run qwen2.5:7b --verbose"><span class="p">$ </span>ollama run qwen2.5:7b --verbose</pre></div><div class="code"><div class="label"><span>inside ollama</span><button class="copy" type="button" data-for="c9">Copy</button></div><pre id="c9" data-copy="explain recursion in one line">&gt;&gt;&gt; explain recursion in one line</pre></div><p>Read the <strong>eval rate</strong> line. That's your tokens per second. Small models fall over on multi-step reasoning, strict JSON and tool calls, and facts they never saw. Pick the smallest model that passes your test.</p></section><section id="cp3"><div class="sec-head"><span class="tag">Checkpoint 03</span><span class="time">15 min</span><h2>Give your agent a local brain.</h2></div><div class="code"><div class="label"><span>mac / linux</span><button class="copy" type="button" data-for="c10">Copy</button></div><pre id="c10" data-copy="git clone https://github.com/shourya0523/hack1984-local-agent
+cd hack1984-local-agent
+cp .env.example .env
+npm start"><span class="p">$ </span>git clone https://github.com/shourya0523/hack1984-local-agent
+<span class="p">$ </span>cd hack1984-local-agent
+<span class="p">$ </span>cp .env.example .env
+<span class="p">$ </span>npm start</pre></div><div class="code"><div class="label"><span>windows</span><button class="copy" type="button" data-for="c11">Copy</button></div><pre id="c11" data-copy="git clone https://github.com/shourya0523/hack1984-local-agent
+cd hack1984-local-agent
+copy .env.example .env
+npm start"><span class="p">$ </span>git clone https://github.com/shourya0523/hack1984-local-agent
+<span class="p">$ </span>cd hack1984-local-agent
+<span class="p">$ </span>copy .env.example .env
+<span class="p">$ </span>npm start</pre></div><div class="code"><div class="label"><span>.env (already set for you)</span><button class="copy" type="button" data-for="c12">Copy</button></div><pre id="c12" data-copy="# .env
+BASE_URL=http://localhost:11434/v1
+API_KEY=ollama
+MODEL=qwen2.5:7b"><span class="c"># .env</span>
+BASE_URL=http://localhost:11434/v1
+API_KEY=ollama
+MODEL=qwen2.5:7b</pre></div><p><strong>Use the 7B.</strong> The 3B fumbles tool calls. Not connecting? <code class='i'>npm run check</code> says what's wrong.</p></section><section id="hands"><div class="sec-head"><span class="tag">Checkpoint 03, part two</span><h2>Give it hands.</h2></div><p>Add one tool to <code class='i'>tools.js</code> that only your laptop can answer: read a file in <code class='i'>~/notes</code>, search a folder you'd never upload, or check your battery. Restart and ask something that needs it. A red <code class='i'>[tool]</code> line means it worked.</p><div class="code"><div class="label"><span>paste inside the tools array</span><button class="copy" type="button" data-for="c13">Copy</button></div><pre id="c13" data-copy="{
+  name: &quot;read_note&quot;,
+  description: &quot;Read a text file from the user&#x27;s ~/notes folder.&quot;,
+  parameters: {
+    type: &quot;object&quot;,
+    properties: { filename: { type: &quot;string&quot;, description: &quot;e.g. ideas.md&quot; } },
+    required: [&quot;filename&quot;],
+  },
+  run: async ({ filename }) =&gt;
+    (await import(&quot;node:fs/promises&quot;)).readFile(
+      (await import(&quot;node:path&quot;)).join((await import(&quot;node:os&quot;)).homedir(), &quot;notes&quot;, filename), &quot;utf8&quot;),
+},">{
+  name: &quot;read_note&quot;,
+  description: &quot;Read a text file from the user&#x27;s ~/notes folder.&quot;,
+  parameters: {
+    type: &quot;object&quot;,
+    properties: { filename: { type: &quot;string&quot;, description: &quot;e.g. ideas.md&quot; } },
+    required: [&quot;filename&quot;],
+  },
+  run: async ({ filename }) =&gt;
+    (await import(&quot;node:fs/promises&quot;)).readFile(
+      (await import(&quot;node:path&quot;)).join((await import(&quot;node:os&quot;)).homedir(), &quot;notes&quot;, filename), &quot;utf8&quot;),
+},</pre></div><div class="code"><div class="label"><span>behind? the finished version</span><button class="copy" type="button" data-for="c14">Copy</button></div><pre id="c14" data-copy="git checkout checkpoint-3
+npm start"><span class="p">$ </span>git checkout checkpoint-3
+<span class="p">$ </span>npm start</pre></div></section><section id="stuck"><div class="sec-head"><span class="tag">Stuck</span><h2>Something broke. Obviously.</h2></div><div class="tbl"><table><thead><tr><th>Problem</th><th>Fix</th></tr></thead><tbody>
+<tr><td>The Wi-Fi died</td><td>Grab a USB drive from a TA. Installers and both models are on it; follow README.txt.</td></tr>
+<tr><td>Laptop is wheezing</td><td>Run <code class="i">ollama ps</code>, then <code class="i">ollama stop</code> the model you're not using. Still slow? Drop to <code class="i">llama3.2:3b</code> and close Chrome.</td></tr>
+<tr><td>Laptop says no</td><td>Use the Groq fallback below. The key is on the whiteboard.</td></tr>
+<tr><td>You fell behind</td><td><code class="i">git checkout checkpoint-3</code> for a working agent.</td></tr>
+<tr><td>Windows</td><td>Raise your hand. We have a person for this.</td></tr></tbody></table></div><div class="code"><div class="label"><span>groq fallback, replace the three lines in .env</span><button class="copy" type="button" data-for="c15">Copy</button></div><pre id="c15" data-copy="BASE_URL=https://api.groq.com/openai/v1
+API_KEY=paste-the-key-from-the-whiteboard
+MODEL=llama-3.3-70b-versatile">BASE_URL=https://api.groq.com/openai/v1
+API_KEY=paste-the-key-from-the-whiteboard
+MODEL=llama-3.3-70b-versatile</pre></div><div class="note"><b>Note</b>The fallback sends your prompts to Groq, which is the opposite of the point. Switch back when you can. The shared key is revoked after closing on Sunday.</div></section><section id="next"><div class="sec-head"><span class="tag">Next workshop</span><h2>Cool. It only works on your laptop.</h2></div><p><strong>GTFOL: get the f*ck off localhost.</strong> Vercel, Neon and a hosted model, so judges can open what you built.</p></section>
+<footer>HACK1984 / Local inference</footer>
+</main>
+</div>
+<script>
+document.querySelectorAll('button.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var pre = document.getElementById(btn.dataset.for);
+    var text = pre.dataset.copy;
+    function ok(){btn.textContent='Copied';btn.classList.add('done');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('done')},1600)}
+    function fallback(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected, press Ctrl/Cmd+C'}
+    try{ navigator.clipboard.writeText(text).then(ok, fallback) }catch(e){ fallback() }
+  });
+});
+</script>
+</body>
+</html>
